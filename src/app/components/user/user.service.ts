@@ -9,7 +9,7 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
-  getPlayers(){
+  getUsers(){
     return this.http.get(`${environment.appUrl}/api/user/get-users`);
   }
 }
