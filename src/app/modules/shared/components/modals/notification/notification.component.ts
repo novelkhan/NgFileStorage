@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-notification',
@@ -7,4 +8,10 @@ import { Component } from '@angular/core';
 })
 export class NotificationComponent {
 
+  
+  isSuccess: boolean = true;
+  title: string = '';
+  message: string = '';
+
+  constructor (public bsModalRef: BsModalRef) {}
 }
