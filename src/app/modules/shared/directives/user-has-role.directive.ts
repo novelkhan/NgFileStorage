@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
   selector: '[appUserHasRole]'
 })
 export class UserHasRoleDirective implements OnInit{
+
   @Input() appUserHasRole: string[] = [];
 
   constructor(private viewContainerRef: ViewContainerRef,
@@ -31,6 +32,7 @@ export class UserHasRoleDirective implements OnInit{
         }
       }
     })
+
   }
 
 }
