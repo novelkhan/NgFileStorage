@@ -11,7 +11,7 @@ import { jwtDecode } from "jwt-decode";
 
 
 
-export const adminGuard: CanActivateFn = (route, state) => {
+export const AdminGuard: CanActivateFn = (route, state) => {
   const accountService = inject(AccountService);
   const sharedService = inject(SharedService);
   const router = inject(Router);

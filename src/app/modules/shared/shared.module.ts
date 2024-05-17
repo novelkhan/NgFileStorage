@@ -5,6 +5,9 @@ import { ValidationMessagesComponent } from './components/errors/validation-mess
 import { NotificationComponent } from './components/modals/notification/notification.component';
 import { UserHasRoleDirective } from './directives/user-has-role.directive';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -17,7 +20,17 @@ import { ModalModule } from 'ngx-bootstrap/modal';
   ],
   imports: [
     CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    HttpClientModule,
     ModalModule.forRoot()
+  ],
+  exports: [
+    RouterModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    ValidationMessagesComponent,
+    UserHasRoleDirective
   ]
 })
 export class SharedModule { }

@@ -5,7 +5,7 @@ import { AccountService } from '../../account/services/account.service';
 import { inject } from '@angular/core';
 import { SharedService } from '../services/shared.service';
 
-export const authorizationGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+export const AuthorizationGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const accountService = inject(AccountService);
   const sharedService = inject(SharedService);
   const router = inject(Router);
