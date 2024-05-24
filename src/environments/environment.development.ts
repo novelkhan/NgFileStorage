@@ -1,5 +1,5 @@
 export const environment = {
     production: false,
-    appUrl: 'https://localhost:7054',
+    appUrl: 'http://localhost:5168',
     userKey: 'fileStorageAppUser'
 };
