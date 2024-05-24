@@ -8,6 +8,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { ExpiringSessionCountdownComponent } from './components/modals/expiring-session-countdown/expiring-session-countdown.component';
 
 
 
@@ -16,7 +17,8 @@ import { HttpClientModule } from '@angular/common/http';
     NotFoundComponent,
     ValidationMessagesComponent,
     NotificationComponent,
-    UserHasRoleDirective
+    UserHasRoleDirective,
+    ExpiringSessionCountdownComponent
   ],
   imports: [
     CommonModule,
