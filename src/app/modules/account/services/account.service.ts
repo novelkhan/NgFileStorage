@@ -26,7 +26,7 @@ export class AccountService {
     private sharedService: SharedService) { }
 
   refreshToken = async () => {
-    this.http.post<User>(`${environment.appUrl}api/account/refresh-token`, {}, {withCredentials: true})
+    this.http.post<User>(`${environment.appUrl}/api/account/refresh-token`, {}, {withCredentials: true})
     .subscribe({
       next: (user: User) => {
         if (user) {
@@ -48,7 +48,7 @@ export class AccountService {
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', 'Bearer ' + jwt);
 
-    return this.http.get<User>(`${environment.appUrl}api/account/refresh-page`, {headers, withCredentials: true}).pipe(
+    return this.http.get<User>(`${environment.appUrl}/api/account/refresh-page`, {headers, withCredentials: true}).pipe(
       map((user: User) => {
         if (user) {
           this.setUser(user);
@@ -58,7 +58,7 @@ export class AccountService {
   }
 
   login(model: Login) {
-    return this.http.post<User>(`${environment.appUrl}api/account/login`, model, {withCredentials: true})
+    return this.http.post<User>(`${environment.appUrl}/api/account/login`, model, {withCredentials: true})
     .pipe(
       map((user: User) => {
         if (user) {
@@ -78,25 +78,25 @@ export class AccountService {
   }
 
   register(model: Register) {
-    return this.http.post(`${environment.appUrl}api/account/register`, model);
+    return this.http.post(`${environment.appUrl}/api/account/register`, model);
   }
 
   
 
   confirmEmail(model: ConfirmEmail) {
-    return this.http.put(`${environment.appUrl}api/account/confirm-email`, model);
+    return this.http.put(`${environment.appUrl}/api/account/confirm-email`, model);
   }
 
   resendEmailConfirmationLink(email: string) {
-    return this.http.post(`${environment.appUrl}api/account/resend-email-confirmation-link/${email}`, {});
+    return this.http.post(`${environment.appUrl}/api/account/resend-email-confirmation-link/${email}`, {});
   }
 
   forgotUsernameOrPassword(email: string) {
-    return this.http.post(`${environment.appUrl}api/account/forgot-username-or-password/${email}`, {});
+    return this.http.post(`${environment.appUrl}/api/account/forgot-username-or-password/${email}`, {});
   }
 
   resetPassword(model: ResetPassword) {
-    return this.http.put(`${environment.appUrl}api/account/reset-password`, model);
+    return this.http.put(`${environment.appUrl}/api/account/reset-password`, model);
   }
 
   getJWT() {
