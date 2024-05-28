@@ -5,9 +5,11 @@ import { ResetPassword } from '../../shared/models/account/resetPassword.model';
 import { ConfirmEmail } from '../../shared/models/account/confirmEmail.model';
 import { Register } from '../../shared/models/account/register.model';
 import { Login } from '../../shared/models/account/login.model';
-import { ReplaySubject, map, of } from 'rxjs';
+import { ReplaySubject, map, of, take } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { SharedService } from '../../shared/services/shared.service';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +18,26 @@ export class AccountService {
   private userSource = new ReplaySubject<User | null>(1);
   user$ = this.userSource.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) { }
+  refreshTokenTimeout: any;
+  timeoutId: any;
+
+  constructor(private http: HttpClient, 
+    private router: Router,
+    private sharedService: SharedService) { }
+
+  refreshToken = async () => {
+    this.http.post<User>(`${environment.appUrl}api/account/refresh-token`, {}, {withCredentials: true})
+    .subscribe({
+      next: (user: User) => {
+        if (user) {
+          this.setUser(user);
+        }
+      }, error: error => {
+        this.sharedService.showNotification(false, 'Error', error.error);
+        this.logout();
+      }
+    })
+  }
 
   refreshUser(jwt: string | null) {
     if (jwt === null) {
@@ -27,7 +48,7 @@ export class AccountService {
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', 'Bearer ' + jwt);
 
-    return this.http.get<User>(`${environment.appUrl}/api/account/refresh-user-token`, {headers}).pipe(
+    return this.http.get<User>(`${environment.appUrl}api/account/refresh-page`, {headers, withCredentials: true}).pipe(
       map((user: User) => {
         if (user) {
           this.setUser(user);
@@ -37,7 +58,7 @@ export class AccountService {
   }
 
   login(model: Login) {
-    return this.http.post<User>(`${environment.appUrl}/api/account/login`, model)
+    return this.http.post<User>(`${environment.appUrl}api/account/login`, model, {withCredentials: true})
     .pipe(
       map((user: User) => {
         if (user) {
@@ -53,28 +74,29 @@ export class AccountService {
     localStorage.removeItem(environment.userKey);
     this.userSource.next(null);
     this.router.navigateByUrl('/');
+    this.stopRefreshTokenTimer();
   }
 
   register(model: Register) {
-    return this.http.post(`${environment.appUrl}/api/account/register`, model);
+    return this.http.post(`${environment.appUrl}api/account/register`, model);
   }
 
   
 
   confirmEmail(model: ConfirmEmail) {
-    return this.http.put(`${environment.appUrl}/api/account/confirm-email`, model);
+    return this.http.put(`${environment.appUrl}api/account/confirm-email`, model);
   }
 
   resendEmailConfirmationLink(email: string) {
-    return this.http.post(`${environment.appUrl}/api/account/resend-email-confirmation-link/${email}`, {});
+    return this.http.post(`${environment.appUrl}api/account/resend-email-confirmation-link/${email}`, {});
   }
 
   forgotUsernameOrPassword(email: string) {
-    return this.http.post(`${environment.appUrl}/api/account/forgot-username-or-password/${email}`, {});
+    return this.http.post(`${environment.appUrl}api/account/forgot-username-or-password/${email}`, {});
   }
 
   resetPassword(model: ResetPassword) {
-    return this.http.put(`${environment.appUrl}/api/account/reset-password`, model);
+    return this.http.put(`${environment.appUrl}api/account/reset-password`, model);
   }
 
   getJWT() {
@@ -87,8 +109,44 @@ export class AccountService {
     }
   }
 
+  checkUserIdleTimout() {
+    this.user$.pipe(take(1)).subscribe({
+      next: (user: User | null) => {
+        // the user is logged in
+        if (user) {
+          // if not currently dipsplaying expiring session modal
+          if (!this.sharedService.displayingExpiringSessionModal) {
+            this.timeoutId = setTimeout(() => {
+              this.sharedService.displayingExpiringSessionModal = true;
+              this.sharedService.openExpiringSessionCountdown();
+              // in 10 minutes of user incativity
+            }, 10 * 60 * 1000);
+          }
+        }
+      }
+    })
+  }
+
   private setUser(user: User) {
+    this.stopRefreshTokenTimer();
+    this.startRefreshTokenTimer(user.jwt);
     localStorage.setItem(environment.userKey, JSON.stringify(user));
     this.userSource.next(user);
+
+    this.sharedService.displayingExpiringSessionModal = false;
+    this.checkUserIdleTimout();
+  }
+
+  private startRefreshTokenTimer(jwt: string) {
+    const decodedToken: any = jwtDecode(jwt);
+    // expires in seconds
+    const expires = new Date(decodedToken.exp * 1000);
+    // 30 seconds before the expiration
+    const timeout = expires.getTime() - Date.now() - (30 * 1000);
+    this.refreshTokenTimeout = setTimeout(this.refreshToken, timeout);
+  }
+
+  private stopRefreshTokenTimer() {
+    clearTimeout(this.refreshTokenTimeout);
   }
 }
