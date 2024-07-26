@@ -3,6 +3,7 @@ import { SharedService } from '../../../services/shared.service';
 import { AccountService } from 'src/app/modules/account/services/account.service';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { Subscription, interval } from 'rxjs';
+import { environment } from 'src/environments/environment.development';
 
 @Component({
   selector: 'app-expiring-session-countdown',
@@ -11,7 +12,8 @@ import { Subscription, interval } from 'rxjs';
 })
 export class ExpiringSessionCountdownComponent implements OnInit, OnDestroy {
   modalRef?: BsModalRef;
-  targetTime: number = 120 // Countdown time in seconds
+  // targetTime: number = 120 // Countdown time in seconds
+  targetTime: number = environment.targetTime // Countdown time in seconds
   remainingTime: number = this.targetTime;
   displayTime: string = this.formatTime(this.remainingTime);
   countdownSubscription: Subscription | undefined;
